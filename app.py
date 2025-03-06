@@ -1,18 +1,19 @@
 import dash
+import dash_bootstrap_components as dbc  # Import Bootstrap Components
 from dash import dcc, html
 import yfinance as yf
 import plotly.graph_objs as go
 import pandas as pd
 
-# Initialize Dash app
-app = dash.Dash(__name__)
+# Initialize Dash app with a dark theme
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
 # Fetch stock data
 def get_stock_data(ticker="AAPL"):
     df = yf.download(ticker, period="6mo", interval="1d", progress=False)
 
     if df.empty:
-        return pd.DataFrame()  # Return empty DataFrame to prevent crashes
+        return pd.DataFrame()  # Prevent crashes if no data
 
     # Flatten MultiIndex columns if necessary
     if isinstance(df.columns, pd.MultiIndex):
@@ -20,9 +21,9 @@ def get_stock_data(ticker="AAPL"):
 
     return df
 
-# Layout of the dashboard
-app.layout = html.Div([
-    html.H1("Stock Market Dashboard", style={'textAlign': 'center'}),
+# Layout of the dashboard (Now with a dark background)
+app.layout = dbc.Container([
+    html.H1("Stock Market Dashboard", style={'textAlign': 'center', 'color': 'white'}),
 
     dcc.Dropdown(
         id="stock-dropdown",
@@ -31,12 +32,12 @@ app.layout = html.Div([
             {"label": "Tesla (TSLA)", "value": "TSLA"},
             {"label": "Amazon (AMZN)", "value": "AMZN"}
         ],
-        value="AAPL",  # Default selection
-        style={'width': '50%'}
+        value="AAPL",
+        style={'width': '50%', 'color': 'black'}  # Ensure dropdown text is visible
     ),
 
-    dcc.Graph(id="candlestick-chart"),
-])
+    dcc.Graph(id="candlestick-chart")
+], fluid=True, style={'backgroundColor': '#121212', 'padding': '20px'})
 
 # Callback to update chart based on dropdown selection
 @app.callback(
@@ -61,7 +62,13 @@ def update_chart(selected_stock):
         )
     ])
 
-    fig.update_layout(title=f"{selected_stock} Price Chart", xaxis_title="Date", yaxis_title="Price")
+    # Apply dark theme styling
+    fig.update_layout(
+        title=f"{selected_stock} Price Chart",
+        xaxis_title="Date",
+        yaxis_title="Price",
+        template="plotly_dark"  # Dark mode for the chart
+    )
 
     return fig
 
