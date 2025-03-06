@@ -7,16 +7,23 @@ import pandas as pd
 # Initialize Dash app
 app = dash.Dash(__name__)
 
-# Fetch stock data (Example: AAPL)
+# Fetch stock data
 def get_stock_data(ticker="AAPL"):
-    df = yf.download(ticker, period="6mo", interval="1d")
+    df = yf.download(ticker, period="6mo", interval="1d", progress=False)
+
+    if df.empty:
+        return pd.DataFrame()  # Return empty DataFrame to prevent crashes
+
+    # Flatten MultiIndex columns if necessary
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [col[0] for col in df.columns]  
+
     return df
 
 # Layout of the dashboard
 app.layout = html.Div([
     html.H1("Stock Market Dashboard", style={'textAlign': 'center'}),
-    
-    # Dropdown for stock selection
+
     dcc.Dropdown(
         id="stock-dropdown",
         options=[
@@ -27,8 +34,7 @@ app.layout = html.Div([
         value="AAPL",  # Default selection
         style={'width': '50%'}
     ),
-    
-    # Candlestick Chart
+
     dcc.Graph(id="candlestick-chart"),
 ])
 
@@ -39,7 +45,11 @@ app.layout = html.Div([
 )
 def update_chart(selected_stock):
     df = get_stock_data(selected_stock)
-    
+
+    if df.empty:
+        return go.Figure()  # Return empty figure if no data
+
+    # Generate Candlestick Chart
     fig = go.Figure(data=[
         go.Candlestick(
             x=df.index,
@@ -50,9 +60,9 @@ def update_chart(selected_stock):
             name="Candlesticks"
         )
     ])
-    
+
     fig.update_layout(title=f"{selected_stock} Price Chart", xaxis_title="Date", yaxis_title="Price")
-    
+
     return fig
 
 # Run the app
