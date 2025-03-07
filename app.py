@@ -1,5 +1,5 @@
 import dash
-import dash_bootstrap_components as dbc  # Import Bootstrap Components
+import dash_bootstrap_components as dbc  
 from dash import dcc, html
 import yfinance as yf
 import plotly.graph_objs as go
@@ -15,40 +15,64 @@ def get_stock_data(ticker="AAPL"):
     if df.empty:
         return pd.DataFrame()  # Prevent crashes if no data
 
-    # Flatten MultiIndex columns if necessary
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = [col[0] for col in df.columns]  
-
     return df
 
-# Layout of the dashboard (Now with a dark background)
-app.layout = dbc.Container([
-    html.H1("Stock Market Dashboard", style={'textAlign': 'center', 'color': 'white'}),
-
-    dcc.Dropdown(
-        id="stock-dropdown",
-        options=[
-            {"label": "Apple (AAPL)", "value": "AAPL"},
-            {"label": "Tesla (TSLA)", "value": "TSLA"},
-            {"label": "Amazon (AMZN)", "value": "AMZN"}
-        ],
-        value="AAPL",
-        style={'width': '50%', 'color': 'black'}  # Ensure dropdown text is visible
+# Sidebar Layout with Search Bar
+sidebar = dbc.Col([
+    html.Label("Search Ticker:", style={'color': 'white'}),
+    dcc.Input(
+        id="stock-input",
+        type="text",
+        placeholder="Enter ticker",
+        value="AAPL",  # Default stock
+        style={
+            'width': '100%',
+            'padding': '10px',
+            'backgroundColor': '#222222',
+            'color': 'white',
+            'border': '1px solid #444444'
+        }
     ),
+], width=2, style={"backgroundColor": "#121212", "padding": "20px", "height": "100vh"})
 
+# Main Content Layout
+content = dbc.Col([
+    html.H1("Stock Market Dashboard", style={'textAlign': 'center', 'color': 'white'}),
+    html.Br(),
     dcc.Graph(id="candlestick-chart")
-], fluid=True, style={'backgroundColor': '#121212', 'padding': '20px'})
+], width=10)
 
-# Callback to update chart based on dropdown selection
+# Full Layout
+app.layout = dbc.Container([
+    dbc.Row([
+        sidebar,   # Sidebar with search bar
+        content    # Main content
+    ])
+], fluid=True)
+
+# Callback to update chart when ticker is entered
 @app.callback(
     dash.Output("candlestick-chart", "figure"),
-    [dash.Input("stock-dropdown", "value")]
+    [dash.Input("stock-input", "value")]
 )
 def update_chart(selected_stock):
+    if not selected_stock:
+        return go.Figure()  # Prevent errors if empty input
+
+    selected_stock = selected_stock.upper()  # Ensure uppercase for consistency
     df = get_stock_data(selected_stock)
+    # Flatten MultiIndex columns if necessary
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [col[0] for col in df.columns]
+
+    # Remove non-trading days (weekends/holidays)
+    df = df[df['Volume'] > 0]
+
+    print(df.head())  # DEBUG: Print first few rows of data
 
     if df.empty:
-        return go.Figure()  # Return empty figure if no data
+        print(f"❌ No data found for {selected_stock}")  # Debugging
+        return go.Figure()  # Return an empty figure if no data is found
 
     # Generate Candlestick Chart
     fig = go.Figure(data=[
@@ -67,9 +91,11 @@ def update_chart(selected_stock):
         title=f"{selected_stock} Price Chart",
         xaxis_title="Date",
         yaxis_title="Price",
-        template="plotly_dark"  # Dark mode for the chart
+        template="plotly_dark",
+        xaxis_rangeslider_visible=False
     )
 
+    print(fig)  # ✅ Check if the figure is properly created
     return fig
 
 # Run the app
