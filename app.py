@@ -17,8 +17,9 @@ def get_stock_data(ticker="AAPL"):
 
     return df
 
-# Sidebar Layout with Search Bar
+# Sidebar Layout
 sidebar = dbc.Col([
+    # Ticker Search Bar
     html.Label("Search Ticker:", style={'color': 'white'}),
     dcc.Input(
         id="stock-input",
@@ -59,20 +60,21 @@ def update_chart(selected_stock):
     if not selected_stock:
         return go.Figure()  # Prevent errors if empty input
 
-    selected_stock = selected_stock.upper()  # Ensure uppercase for consistency
+    selected_stock = selected_stock.upper()  # Ensure uppercase
+
     df = get_stock_data(selected_stock)
-    # Flatten MultiIndex columns if necessary
+
+    # Flatten MultiIndex columns
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = [col[0] for col in df.columns]
 
-    # Remove non-trading days (weekends/holidays)
-    df = df[df['Volume'] > 0]
-
-    print(df.head())  # DEBUG: Print first few rows of data
-
+    # Debugging
+    '''
+    print(df.head())
     if df.empty:
         print(f"❌ No data found for {selected_stock}")  # Debugging
         return go.Figure()  # Return an empty figure if no data is found
+    '''
 
     # Generate Candlestick Chart
     fig = go.Figure(data=[
@@ -95,9 +97,8 @@ def update_chart(selected_stock):
         xaxis_rangeslider_visible=False
     )
 
-    print(fig)  # ✅ Check if the figure is properly created
     return fig
 
-# Run the app
+# Run the app: python app.py
 if __name__ == '__main__':
     app.run_server(debug=True)
