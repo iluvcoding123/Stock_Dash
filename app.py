@@ -57,8 +57,8 @@ app.layout = dbc.Container([
     [dash.Input("stock-input", "value")]
 )
 def update_chart(selected_stock):
-    if not selected_stock:
-        return go.Figure()  # Prevent errors if empty input
+    if not selected_stock:  # If input is blank
+        return create_placeholder_chart()
 
     selected_stock = selected_stock.upper()  # Ensure uppercase
 
@@ -88,16 +88,31 @@ def update_chart(selected_stock):
         )
     ])
 
-    # Apply dark theme styling
+    # Apply dark theme to chart
     fig.update_layout(
         title=f"{selected_stock} Price Chart",
         xaxis_title="Date",
         yaxis_title="Price",
         template="plotly_dark",
-        xaxis_rangeslider_visible=False
+        xaxis_rangeslider_visible=False,
+        xaxis=dict(type="category") # Eliminate gaps (weekends/holidays)
     )
 
     return fig
+
+# Function to create a dark-themed placeholder chart
+def create_placeholder_chart():
+    fig = go.Figure()
+    fig.update_layout(
+        title="Enter a valid ticker",
+        xaxis_title="Date",
+        yaxis_title="Price",
+        template="plotly_dark",  # Ensure it matches dark theme
+        xaxis_rangeslider_visible=False,
+    )
+    return fig
+
+
 
 # Run the app: python app.py
 if __name__ == '__main__':
