@@ -17,58 +17,103 @@ def get_stock_data(ticker="SPY", timeframe="1y"):
 
     return df
 
-# Sidebar Layout
+# Sidebar Layout with Navigation
 sidebar = dbc.Col([
-    # Ticker Search Bar
-    html.Label("Search Ticker:", style={'color': 'white'}),
-    dcc.Input(
-        id="stock-input",
-        type="text",
-        placeholder="Enter ticker",
-        value="SPY",  # Default stock
-        style={
-            'width': '100%',
-            'padding': '10px',
-            'backgroundColor': '#222222',
-            'color': 'white',
-            'border': '1px solid #444444'
-        }
-    ),
-    html.Br(),
+    html.H2("Dashboard", style={'color': 'white'}),
+    html.Hr(),
     
-    # Timeframe Dropdown
-    html.Label("Select Timeframe:", style={'color': 'white'}),
-    dcc.Dropdown(
-        id="timeframe-dropdown",
-        options=[
-            {"label": "1 Year", "value": "1y"},
-            {"label": "6 Months", "value": "6mo"},
-            {"label": "3 Months", "value": "3mo"},
-            {"label": "1 Month", "value": "1mo"}
-        ],
-        value="6mo",  # Default timeframe
-        clearable=False,
-        style={
-            'backgroundColor': '#222222',
-            'color': 'black'  # Text color
-        }
-    ),
+    # Navigation Links
+    dbc.Nav([
+        dbc.NavLink("Search", href="/", active="exact"),
+        dbc.NavLink("Heatmap", href="/heatmap", active="exact"),
+        dbc.NavLink("Market Overview", href="/market-overview", active="exact"),
+    ], vertical=True, pills=True, style={'padding': '10px'}),
+
+    html.Hr(),
+
+    # Stock Input & Timeframe Selection (Only for Candlestick Page)
+    html.Div(id="sidebar-content")  
 ], width=2, style={"backgroundColor": "#121212", "padding": "20px", "height": "100vh"})
 
-# Main Content Layout
-content = dbc.Col([
-    html.H1("Stock Market Dashboard", style={'textAlign': 'center', 'color': 'white'}),
-    html.Br(),
-    dcc.Graph(id="candlestick-chart")
-], width=10)
-
-# Full Layout
+# App Layout with Routing
 app.layout = dbc.Container([
+    dcc.Location(id="url", refresh=False),  # Tracks URL changes
     dbc.Row([
-        sidebar,   # Sidebar with search bar
-        content    # Main content
+        sidebar,  # Sidebar with navigation links
+        dbc.Col(id="page-content", width=10)  # Main content section
     ])
 ], fluid=True)
+
+# Callback to update sidebar content dynamically
+@app.callback(
+    dash.Output("sidebar-content", "children"),
+    [dash.Input("url", "pathname")]
+)
+def update_sidebar(pathname):
+    if pathname == "/":
+        return dbc.Container([
+            html.Label("Search Ticker:", style={'color': 'white'}),
+            dcc.Input(
+                id="stock-input",
+                type="text",
+                placeholder="Enter ticker",
+                value="SPY",
+                style={'width': '100%', 'padding': '10px', 'backgroundColor': '#222222', 'color': 'white'}
+            ),
+            html.Br(),
+            
+            html.Label("Select Timeframe:", style={'color': 'white'}),
+            dcc.Dropdown(
+                id="timeframe-dropdown",
+                options=[
+                    {"label": "1 Year", "value": "1y"},
+                    {"label": "6 Months", "value": "6mo"},
+                    {"label": "3 Months", "value": "3mo"},
+                    {"label": "1 Month", "value": "1mo"}
+                ],
+                value="6mo",
+                clearable=False
+            )
+        ])
+    else:
+        return None
+
+# Callback to update page content dynamically
+@app.callback(
+    dash.Output("page-content", "children"),
+    [dash.Input("url", "pathname")]
+)
+def display_page(pathname):
+    if pathname == "/heatmap":
+        return create_heatmap_page()
+    elif pathname == "/market-overview":
+        return create_market_overview_page()
+    else:
+        return create_search_page()  # Default to Candlestick Chart
+
+# Candlestick Chart Page
+def create_search_page():
+    return dbc.Container([
+        html.H1("Ticker Search", style={'textAlign': 'center', 'color': 'white'}),
+        html.Br(),
+        dcc.Graph(id="candlestick-chart")
+    ])
+
+# Heatmap Page
+def create_heatmap_page():
+    return dbc.Container([
+        html.H1("Market Heatmap", style={'textAlign': 'center', 'color': 'white'}),
+        html.Br(),
+        dcc.Graph(id="heatmap-chart")
+    ])
+
+# Market Overview Page
+def create_market_overview_page():
+    return dbc.Container([
+        html.H1("Market Overview", style={'textAlign': 'center', 'color': 'white'}),
+        html.Br(),
+        dcc.Graph(id="market-overview-chart")
+    ])
 
 # Callback to update chart when ticker or timeframe is changed
 @app.callback(
@@ -122,8 +167,6 @@ def create_placeholder_chart():
         xaxis_rangeslider_visible=False,
     )
     return fig
-
-
 
 # Run the app: python app.py
 if __name__ == '__main__':
