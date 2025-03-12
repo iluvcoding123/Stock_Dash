@@ -8,9 +8,9 @@ import pandas as pd
 # Initialize Dash app with a dark theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
-# Fetch stock data
-def get_stock_data(ticker="AAPL"):
-    df = yf.download(ticker, period="6mo", interval="1d", progress=False)
+# Function to fetch stock data
+def get_stock_data(ticker="SPY", timeframe="1y"):
+    df = yf.download(ticker, period=timeframe, interval="1d", progress=False)
 
     if df.empty:
         return pd.DataFrame()  # Prevent crashes if no data
@@ -25,13 +25,32 @@ sidebar = dbc.Col([
         id="stock-input",
         type="text",
         placeholder="Enter ticker",
-        value="AAPL",  # Default stock
+        value="SPY",  # Default stock
         style={
             'width': '100%',
             'padding': '10px',
             'backgroundColor': '#222222',
             'color': 'white',
             'border': '1px solid #444444'
+        }
+    ),
+    html.Br(),
+    
+    # Timeframe Dropdown
+    html.Label("Select Timeframe:", style={'color': 'white'}),
+    dcc.Dropdown(
+        id="timeframe-dropdown",
+        options=[
+            {"label": "1 Year", "value": "1y"},
+            {"label": "6 Months", "value": "6mo"},
+            {"label": "3 Months", "value": "3mo"},
+            {"label": "1 Month", "value": "1mo"}
+        ],
+        value="6mo",  # Default timeframe
+        clearable=False,
+        style={
+            'backgroundColor': '#222222',
+            'color': 'black'  # Text color
         }
     ),
 ], width=2, style={"backgroundColor": "#121212", "padding": "20px", "height": "100vh"})
@@ -51,30 +70,23 @@ app.layout = dbc.Container([
     ])
 ], fluid=True)
 
-# Callback to update chart when ticker is entered
+# Callback to update chart when ticker or timeframe is changed
 @app.callback(
     dash.Output("candlestick-chart", "figure"),
-    [dash.Input("stock-input", "value")]
+    [dash.Input("stock-input", "value"),
+     dash.Input("timeframe-dropdown", "value")]
 )
-def update_chart(selected_stock):
+def update_chart(selected_stock, selected_timeframe):
     if not selected_stock:  # If input is blank
         return create_placeholder_chart()
 
     selected_stock = selected_stock.upper()  # Ensure uppercase
 
-    df = get_stock_data(selected_stock)
+    df = get_stock_data(selected_stock, selected_timeframe)
 
     # Flatten MultiIndex columns
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = [col[0] for col in df.columns]
-
-    # Debugging
-    '''
-    print(df.head())
-    if df.empty:
-        print(f"❌ No data found for {selected_stock}")  # Debugging
-        return go.Figure()  # Return an empty figure if no data is found
-    '''
 
     # Generate Candlestick Chart
     fig = go.Figure(data=[
@@ -90,12 +102,11 @@ def update_chart(selected_stock):
 
     # Apply dark theme to chart
     fig.update_layout(
-        title=f"{selected_stock} Price Chart",
+        title=f"{selected_stock} Price Chart ({selected_timeframe}, 1d)",
         xaxis_title="Date",
         yaxis_title="Price",
         template="plotly_dark",
         xaxis_rangeslider_visible=False,
-        xaxis=dict(type="category") # Eliminate gaps (weekends/holidays)
     )
 
     return fig
