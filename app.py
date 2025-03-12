@@ -5,6 +5,7 @@ import yfinance as yf
 import plotly.graph_objs as go
 import pandas as pd
 from utils import get_stock_data
+from charts import create_placeholder_chart
 
 # Initialize Dash app with a dark theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
@@ -119,19 +120,6 @@ def update_chart(selected_stock, selected_timeframe):
     )
 
     return fig
-
-# Function to create a dark-themed placeholder chart
-def create_placeholder_chart():
-    fig = go.Figure()
-    fig.update_layout(
-        title="Enter a valid ticker",
-        xaxis_title="Date",
-        yaxis_title="Price",
-        template="plotly_dark",  # Ensure it matches dark theme
-        xaxis_rangeslider_visible=False,
-    )
-    return fig
-
 
 
 # Run the app: python app.py
