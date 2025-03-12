@@ -19,46 +19,62 @@ def get_stock_data(ticker="SPY", timeframe="1y"):
 
 # Sidebar Layout
 sidebar = dbc.Col([
-    # Ticker Search Bar
-    html.Label("Search Ticker:", style={'color': 'white'}),
-    dcc.Input(
-        id="stock-input",
-        type="text",
-        placeholder="Enter ticker",
-        value="SPY",  # Default stock
-        style={
-            'width': '100%',
-            'padding': '10px',
-            'backgroundColor': '#222222',
-            'color': 'white',
-            'border': '1px solid #444444'
-        }
-    ),
-    html.Br(),
+    html.H2("Dashboard", className="text-center", style={'color': 'white'}),
+    html.Hr(),
+
+    # Navigation Links
+    dbc.Nav([
+        dbc.NavLink("Search", href="/", active="exact"),
+        dbc.NavLink("Heatmap", href="/heatmap", active="exact"),
+        dbc.NavLink("Market Overview", href="/market-overview", active="exact"),
+    ], vertical=True, pills=True, style={'padding': '10px'}),
     
-    # Timeframe Dropdown
-    html.Label("Select Timeframe:", style={'color': 'white'}),
-    dcc.Dropdown(
-        id="timeframe-dropdown",
-        options=[
-            {"label": "1 Year", "value": "1y"},
-            {"label": "6 Months", "value": "6mo"},
-            {"label": "3 Months", "value": "3mo"},
-            {"label": "1 Month", "value": "1mo"}
-        ],
-        value="6mo",  # Default timeframe
-        clearable=False,
-        style={
-            'backgroundColor': '#222222',
-            'color': 'black'  # Text color
-        }
-    ),
+    html.Hr(),
 ], width=2, style={"backgroundColor": "#121212", "padding": "20px", "height": "100vh"})
 
 # Main Content Layout
 content = dbc.Col([
-    html.H1("Stock Market Dashboard", style={'textAlign': 'center', 'color': 'white'}),
+    html.H1("Search", style={'textAlign': 'center', 'color': 'white'}),
     html.Br(),
+    # Search Ticker and Timeframe Selection (NEW LOCATION)
+    dbc.Row([
+        dbc.Col([
+            html.Label("Search Ticker:", style={'color': 'white'}),
+            dcc.Input(
+                id="stock-input",
+                type="text",
+                placeholder="Enter ticker",
+                value="SPY",
+                style={
+                    'width': '100%',
+                    'padding': '10px',
+                    'backgroundColor': '#222222',
+                    'color': 'white',
+                    'border': '1px solid #444444'
+                }
+            )
+        ], width=4),  # Adjust width as needed
+
+        dbc.Col([
+            html.Label("Select Timeframe:", style={'color': 'white'}),
+            dcc.Dropdown(
+                id="timeframe-dropdown",
+                options=[
+                    {"label": "1 Year", "value": "1y"},
+                    {"label": "6 Months", "value": "6mo"},
+                    {"label": "3 Months", "value": "3mo"},
+                    {"label": "1 Month", "value": "1mo"}
+                ],
+                value="6mo",
+                clearable=False,
+                style={'backgroundColor': '#222222', 'color': 'black'}
+            )
+        ], width=4),
+    ], justify="center"),  # Center alignment
+
+    html.Br(),
+
+    # Candlestick Chart
     dcc.Graph(id="candlestick-chart")
 ], width=10)
 
