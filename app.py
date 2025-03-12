@@ -4,22 +4,15 @@ from dash import dcc, html
 import yfinance as yf
 import plotly.graph_objs as go
 import pandas as pd
+from utils import get_stock_data
 
 # Initialize Dash app with a dark theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
-# Function to fetch stock data
-def get_stock_data(ticker="SPY", timeframe="1y"):
-    df = yf.download(ticker, period=timeframe, interval="1d", progress=False)
-
-    if df.empty:
-        return pd.DataFrame()  # Prevent crashes if no data
-
-    return df
 
 # Sidebar Layout
 sidebar = dbc.Col([
-    html.H2("Dashboard", className="text-center", style={'color': 'white'}),
+    html.H3("Dashboard", className="text-center", style={'color': 'white'}),
     html.Hr(),
 
     # Navigation Links
