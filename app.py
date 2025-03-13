@@ -3,8 +3,9 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 from pages.heatmap import heatmap_layout
 from pages.market_overview import market_overview_layout
-from pages.search import search_layout, register_search_callbacks
+from pages.search import search_layout
 from dash.dependencies import Input, Output
+from callbacks import register_callbacks
 
 # Initialize Dash app with a dark theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
@@ -38,16 +39,7 @@ app.layout = dbc.Container([
 ], fluid=True)
 
 # Register Callbacks for Each Page
-register_search_callbacks(app)
-
-# Page Navigation Callback
-@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-def display_page(pathname):
-    if pathname == "/heatmap":
-        return heatmap_layout()
-    elif pathname == "/market-overview":
-        return market_overview_layout()
-    return search_layout()  # Default to Search page
+register_callbacks(app)
 
 # Run the app
 if __name__ == '__main__':
