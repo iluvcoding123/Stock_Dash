@@ -1,7 +1,7 @@
 import dash
 import dash_bootstrap_components as dbc  
 from dash import dcc, html
-from pages.heatmap import heatmap_layout, register_heatmap_callbacks
+from pages.heatmap import heatmap_layout
 from pages.market_overview import market_overview_layout
 from pages.search import search_layout, register_search_callbacks
 from dash.dependencies import Input, Output
@@ -39,7 +39,7 @@ app.layout = dbc.Container([
 
 # Register Callbacks for Each Page
 register_search_callbacks(app)
-register_heatmap_callbacks(app)
+
 
 # Page Navigation Callback
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
