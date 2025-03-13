@@ -40,7 +40,6 @@ app.layout = dbc.Container([
 # Register Callbacks for Each Page
 register_search_callbacks(app)
 
-
 # Page Navigation Callback
 @app.callback(Output("page-content", "children"), [Input("url", "pathname")])
 def display_page(pathname):
