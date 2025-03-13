@@ -1,18 +1,14 @@
 import dash
 import dash_bootstrap_components as dbc  
 from dash import dcc, html
-import yfinance as yf
-import plotly.graph_objs as go
-import pandas as pd
-from utils import get_stock_data
-from charts import create_placeholder_chart
-from heatmap import heatmap_layout
-from market_overview import market_overview_layout
-from search import search_layout, register_search_callbacks
+from pages.heatmap import heatmap_layout, register_heatmap_callbacks
+from pages.market_overview import market_overview_layout
+from pages.search import search_layout, register_search_callbacks
+from dash.dependencies import Input, Output
 
 # Initialize Dash app with a dark theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
-
+app.title = "Stock Market Dashboard"
 
 # Sidebar Layout
 sidebar = dbc.Col([
@@ -29,21 +25,31 @@ sidebar = dbc.Col([
     html.Hr(),
 ], width=2, style={"backgroundColor": "#121212", "padding": "20px", "height": "100vh"})
 
-# Main Content Layout
-content = search_layout()
+# Page Content Layout
+content = dbc.Col(id="page-content", width=10, style={"padding": "20px"})
 
 # Full Layout
 app.layout = dbc.Container([
+    dcc.Location(id='url', refresh=False),  # Allows dynamic page routing
     dbc.Row([
-        sidebar,   # Sidebar with search bar
-        content    # Main content
+        sidebar,  # Sidebar navigation
+        content   # Page content that changes dynamically
     ])
 ], fluid=True)
 
-# Callback to update chart when ticker or timeframe is changed
+# Register Callbacks for Each Page
 register_search_callbacks(app)
+register_heatmap_callbacks(app)
 
+# Page Navigation Callback
+@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+def display_page(pathname):
+    if pathname == "/heatmap":
+        return heatmap_layout()
+    elif pathname == "/market-overview":
+        return market_overview_layout()
+    return search_layout()  # Default to Search page
 
-# Run the app: python app.py
+# Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
