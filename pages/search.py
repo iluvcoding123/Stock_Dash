@@ -1,21 +1,15 @@
-import dash
-import dash_bootstrap_components as dbc
 from dash import dcc, html
-import plotly.graph_objs as go
-import pandas as pd
-from utils import get_stock_data
-from charts import create_placeholder_chart
-from dash.dependencies import Input, Output
+import dash_bootstrap_components as dbc
 
 def search_layout():
     """
     Layout for the Search page.
     """
     return dbc.Col([
-        html.H1("Search", style={'textAlign': 'center', 'color': 'white'}),
-        html.Br(),
+        html.H2("Search", className="text-center", style={'color': 'white'}),
+        html.Hr(),
 
-        # Search Ticker and Timeframe Selection
+        # Search Input and Timeframe Selection
         dbc.Row([
             dbc.Col([
                 html.Label("Search Ticker:", style={'color': 'white'}),
@@ -32,7 +26,7 @@ def search_layout():
                         'border': '1px solid #444444'
                     }
                 )
-            ], width=4),  # Adjust width as needed
+            ], width=4),  
 
             dbc.Col([
                 html.Label("Select Timeframe:", style={'color': 'white'}),
@@ -49,11 +43,26 @@ def search_layout():
                     style={'backgroundColor': '#222222', 'color': 'black'}
                 )
             ], width=4),
-        ], justify="center"),  # Center alignment
+        ], justify="center"),  
 
         html.Br(),
 
         # Candlestick Chart
-        dcc.Graph(id="candlestick-chart")
-    ], width=10)
+        dcc.Graph(id="candlestick-chart"),
 
+        html.Br(),
+
+        # SMA Selection Checkboxes
+        html.Label("Show Moving Averages:", style={'color': 'white'}),
+        dcc.Checklist(
+            id="sma-checkbox",
+            options=[
+                {"label": "50-day SMA", "value": "SMA50"},
+                {"label": "100-day SMA", "value": "SMA100"},
+                {"label": "200-day SMA", "value": "SMA200"}
+            ],
+            value=[],  # Default: No SMAs selected
+            inline=True,
+            style={'color': 'white'}
+        )
+    ], width=10)
