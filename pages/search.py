@@ -53,16 +53,17 @@ def search_layout():
         html.Br(),
 
         # SMA Selection Checkboxes
-        html.Label("Show Moving Averages:", style={'color': 'white'}),
-        dcc.Checklist(
+        html.Label("Show Moving Averages:", style={'color': 'white', 'font-weight': 'bold'}),
+        dbc.Checklist(
             id="sma-checkbox",
             options=[
-                {"label": "50-day SMA", "value": "SMA50"},
-                {"label": "100-day SMA", "value": "SMA100"},
-                {"label": "200-day SMA", "value": "SMA200"}
+                {"label": " 50-day SMA", "value": "SMA50"},
+                {"label": " 100-day SMA", "value": "SMA100"},
+                {"label": " 200-day SMA", "value": "SMA200"}
             ],
             value=[],  # Default: No SMAs selected
             inline=True,
-            style={'color': 'white'}
+            switch=True,  # Turns checkboxes into Bootstrap-style toggle switches
+            style={'color': 'white', 'margin-top': '10px'}
         )
     ], width=10)
