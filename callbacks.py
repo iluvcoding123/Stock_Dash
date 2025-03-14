@@ -60,7 +60,8 @@ def register_callbacks(app):
                 high=df_filtered['High'],
                 low=df_filtered['Low'],
                 close=df_filtered['Close'],
-                name="Candlesticks"
+                name="Candlesticks",
+                showlegend=False
             )
         ])
 
