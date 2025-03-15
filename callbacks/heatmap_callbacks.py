@@ -56,14 +56,19 @@ def register_heatmap_callbacks(app):
         """Generates the sector performance heatmap with adjusted color scaling."""
         df = get_sector_performance()
 
-        # Adjusted color scale with whitish-yellow neutral, dark red for lows, and dark green for highs
+        # Updated custom color scale
         custom_colorscale = [
-            [0.0, "#8B0000"],   # Dark Red (Strong Negative)
-            [0.3, "#FF8C00"],   # Orange (-1.5% to -0.5%)
-            [0.5, "#FFFACD"],   # Whitish Yellow (Neutral, ~0%)
-            [0.7, "#9ACD32"],   # Yellowish Green (+0.5% to +1.5%)
-            [1.0, "#004d00"]    # Darker Green (Strong Positive)
+            [0.0, "#B71C1C"],   # Darker Red (-2.5% or lower)
+            [0.25, "#F57C00"],  # Orange-Red (-1.25%)
+            [0.45, "#FFF176"],  # Light Yellow (Near Neutral Negative)
+            [0.50, "#FFFFCC"],  # Whitish Yellow (True Neutral)
+            [0.55, "#9CCC65"],  # Yellow-Green (Near Neutral Positive)
+            [0.75, "#66BB6A"],  # Lighter Green (+1.25%)
+            [1.0, "#1B5E20"]    # Darker Green (+2.5% or higher)
         ]
+
+        # Format values for display in heatmap
+        text_values = df.set_index("Sector").T.applymap(lambda x: f"{x:.2%}" if pd.notna(x) else "")
 
         fig = px.imshow(
             df.set_index("Sector").T.values,  
@@ -71,8 +76,15 @@ def register_heatmap_callbacks(app):
             y=["1D Change", "5D Change", "1M Change"],  
             color_continuous_scale=custom_colorscale,
             labels={"x": "Sector", "y": "Metric", "color": "Change %"},
-            zmin=-0.025,  # Expanded range for better scaling
-            zmax=0.025
+            zmin=-0.025,  # Set to -2.5%
+            zmax=0.025,   # Set to +2.5%
+            text_auto=True  # Display numerical values in heatmap cells
+        )
+
+        fig.update_traces(
+            text=text_values.values,
+            texttemplate="%{text}",
+            textfont=dict(size=14, color="black")  # Adjust font size and color
         )
 
         fig.update_layout(
