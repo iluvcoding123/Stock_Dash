@@ -5,7 +5,7 @@ from charts import create_placeholder_chart  # Import the placeholder chart func
 def heatmap_layout():
     """Layout for the heatmap page."""
     return dbc.Container([
-        html.H2("Heatmap", className="text-center", style={'color': 'white'}),
+        html.H2("Sector Performance Heatmap", className="text-center", style={'color': 'white'}),
         html.Hr(),
         dbc.Row([
             dbc.Col([

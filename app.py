@@ -5,7 +5,8 @@ from pages.heatmap import heatmap_layout
 from pages.market_overview import market_overview_layout
 from pages.search import search_layout
 from dash.dependencies import Input, Output
-from callbacks import register_callbacks
+from callbacks.callbacks import register_callbacks
+from callbacks.search_callbacks import register_search_callbacks  # Import Search Callbacks
 
 # Initialize Dash app with a dark theme
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
@@ -38,8 +39,8 @@ app.layout = dbc.Container([
     ])
 ], fluid=True)
 
-# Register Callbacks for Each Page
-register_callbacks(app)
+# Register Callbacks
+register_callbacks(app)  
 
 # Run the app
 if __name__ == '__main__':
