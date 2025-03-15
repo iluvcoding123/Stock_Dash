@@ -1,6 +1,5 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-from charts import create_placeholder_chart  # Import the placeholder chart function
 
 def heatmap_layout():
     """Layout for the heatmap page."""
@@ -10,8 +9,7 @@ def heatmap_layout():
         dbc.Row([
             dbc.Col([
                 dcc.Graph(
-                    id="sector-heatmap",
-                    figure=create_placeholder_chart()  # Use the placeholder chart
+                    id="sector-heatmap"  # The heatmap will be updated dynamically via callbacks
                 )
             ], width=12)
         ]),
