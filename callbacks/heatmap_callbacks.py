@@ -60,9 +60,9 @@ def register_heatmap_callbacks(app):
         custom_colorscale = [
             [0.0, "#B71C1C"],   # Darker Red (-2.5% or lower)
             [0.25, "#F57C00"],  # Orange-Red (-1.25%)
-            [0.45, "#FFF176"],  # Light Yellow (Near Neutral Negative)
+            [0.45, "#FFF59D"],  # Light Yellow (Near Neutral Negative)
             [0.50, "#FFFFCC"],  # Whitish Yellow (True Neutral)
-            [0.55, "#C0D860"],  # Yellow-Green (Near Neutral Positive)
+            [0.55, "#D0E870"],  # Yellow-Green (Near Neutral Positive)
             [0.75, "#9CCC65"],  # Yellower Light Green (+1.25%)
             [1.0, "#1B5E20"]    # Darker Green (+2.5% or higher)
         ]

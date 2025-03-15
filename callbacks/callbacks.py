@@ -4,6 +4,7 @@ from pages.heatmap import heatmap_layout
 from pages.market_overview import market_overview_layout
 from callbacks.search_callbacks import register_search_callbacks  
 from callbacks.heatmap_callbacks import register_heatmap_callbacks
+from callbacks.market_overview_callbacks import register_market_overview_callbacks
 
 def register_callbacks(app):
     """Registers all Dash callbacks."""
@@ -11,6 +12,7 @@ def register_callbacks(app):
     # Register Search Callbacks
     register_search_callbacks(app)  
     register_heatmap_callbacks(app)
+    register_market_overview_callbacks(app)
 
     # Page Navigation Callback
     @app.callback(
