@@ -51,8 +51,12 @@ def register_callbacks(app):
         df["SMA100"] = df["Close"].rolling(window=100).mean()
         df["SMA200"] = df["Close"].rolling(window=200).mean()
 
+        fig = go.Figure()
+
         # Determine x-axis range based on selected timeframe
         max_date = df.index.max()
+        buffer_days = pd.DateOffset(days=1)  
+
         if selected_timeframe == "1y":
             min_date = max_date - pd.DateOffset(years=1)
         elif selected_timeframe == "6mo":
@@ -64,6 +68,13 @@ def register_callbacks(app):
         else:
             min_date = max_date - pd.DateOffset(months=6)  # Default to 6 months
 
+        # Adjust max_date to prevent cutoff
+        adjusted_max_date = max_date + buffer_days
+
+        # Update x-axis range with a slight extension to the right
+        fig.update_layout(
+            xaxis=dict(range=[min_date, adjusted_max_date])
+)
         # Generate Candlestick Chart using **full** data but zooming to selected timeframe
         fig = go.Figure(data=[
             go.Candlestick(
@@ -91,7 +102,7 @@ def register_callbacks(app):
             fig.add_trace(go.Scatter(x=df.index, y=df["SMA200"], mode="lines", name="200-day SMA", line=dict(color="red")))
 
         # Filter the data for the selected timeframe range
-        df_filtered = df.loc[min_date:max_date]
+        df_filtered = df.loc[min_date:adjusted_max_date]
 
         # Calculate min and max price for the visible range
         y_min = df_filtered[['Low', 'SMA50', 'SMA100', 'SMA200']].min().min()
@@ -104,7 +115,7 @@ def register_callbacks(app):
             yaxis_title="Price",
             template="plotly_dark",
             xaxis_rangeslider_visible=False,  # Keep the range slider off
-            xaxis=dict(range=[min_date, max_date]),  # Zoom x-axis based on selection
+            xaxis=dict(range=[min_date, adjusted_max_date]),  # Zoom x-axis based on selection
             yaxis=dict(range=[y_min * 0.98, y_max * 1.02], fixedrange=False)  # Auto-adjust y-axis
         )
 
