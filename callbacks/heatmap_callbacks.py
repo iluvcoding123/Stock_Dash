@@ -56,15 +56,13 @@ def register_heatmap_callbacks(app):
         """Generates the sector performance heatmap with adjusted color scaling."""
         df = get_sector_performance()
 
-        # Expanded range (-2.5% to +2.5%) with softer colors
+        # Adjusted color scale with whitish-yellow neutral, dark red for lows, and dark green for highs
         custom_colorscale = [
-            [0.0, "#B22222"],   # Muted Red (-2.5% or lower)
-            [0.2, "#D32F2F"],   # Softer Red (-1.5%)
-            [0.4, "#8B0000"],   # Dark Red (-0.75%)
-            [0.5, "#2E2E2E"],   # Dark Gray (0% center)
-            [0.6, "#006400"],   # Dark Green (+0.75%)
-            [0.8, "#3C914A"],   # Softer Green (+1.5%)
-            [1.0, "#32CD32"]    # Muted Green (+2.5% or higher)
+            [0.0, "#8B0000"],   # Dark Red (Strong Negative)
+            [0.3, "#FF8C00"],   # Orange (-1.5% to -0.5%)
+            [0.5, "#FFFACD"],   # Whitish Yellow (Neutral, ~0%)
+            [0.7, "#9ACD32"],   # Yellowish Green (+0.5% to +1.5%)
+            [1.0, "#004d00"]    # Darker Green (Strong Positive)
         ]
 
         fig = px.imshow(
@@ -73,7 +71,7 @@ def register_heatmap_callbacks(app):
             y=["1D Change", "5D Change", "1M Change"],  
             color_continuous_scale=custom_colorscale,
             labels={"x": "Sector", "y": "Metric", "color": "Change %"},
-            zmin=-0.025,  # Expanded range
+            zmin=-0.025,  # Expanded range for better scaling
             zmax=0.025
         )
 
