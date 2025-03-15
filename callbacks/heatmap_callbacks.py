@@ -62,8 +62,8 @@ def register_heatmap_callbacks(app):
             [0.25, "#F57C00"],  # Orange-Red (-1.25%)
             [0.45, "#FFF176"],  # Light Yellow (Near Neutral Negative)
             [0.50, "#FFFFCC"],  # Whitish Yellow (True Neutral)
-            [0.55, "#9CCC65"],  # Yellow-Green (Near Neutral Positive)
-            [0.75, "#66BB6A"],  # Lighter Green (+1.25%)
+            [0.55, "#C0D860"],  # Yellow-Green (Near Neutral Positive)
+            [0.75, "#9CCC65"],  # Yellower Light Green (+1.25%)
             [1.0, "#1B5E20"]    # Darker Green (+2.5% or higher)
         ]
 
