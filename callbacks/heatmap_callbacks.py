@@ -17,11 +17,11 @@ def get_sector_performance():
     }
 
     metrics = ["1D Change", "5D Change", "1M Change"]
-    df_list = []  # Use a list instead of direct concatenation
+    df_list = []  
 
     for sector, ticker in sector_tickers.items():
         stock = yf.Ticker(ticker)
-        hist = stock.history(period="1mo")  # Get past month of data
+        hist = stock.history(period="1mo")  
 
         if hist.empty:
             continue
@@ -38,16 +38,10 @@ def get_sector_performance():
             "1M Change": [(last_close - prev_1m) / prev_1m]
         })
         
-        # Ensure that sector_data is valid before appending
         if not sector_data.isna().all().all():
             df_list.append(sector_data)
 
-
-    # Concatenate only if there's valid data
-    if df_list:
-        df = pd.concat(df_list, ignore_index=True)
-    else:
-        df = pd.DataFrame(columns=["Sector"] + metrics)  # Return an empty but structured DataFrame
+    df = pd.concat(df_list, ignore_index=True) if df_list else pd.DataFrame(columns=["Sector"] + metrics)
 
     return df
 
@@ -56,20 +50,31 @@ def register_heatmap_callbacks(app):
 
     @app.callback(
         Output("sector-heatmap", "figure"),
-        Input("url", "pathname")  # Trigger update when the page loads
+        Input("url", "pathname")  
     )
     def update_heatmap(_):
-        """Generates the sector performance heatmap with real data."""
+        """Generates the sector performance heatmap with adjusted color scaling."""
         df = get_sector_performance()
 
+        # Expanded range (-2.5% to +2.5%) with softer colors
+        custom_colorscale = [
+            [0.0, "#B22222"],   # Muted Red (-2.5% or lower)
+            [0.2, "#D32F2F"],   # Softer Red (-1.5%)
+            [0.4, "#8B0000"],   # Dark Red (-0.75%)
+            [0.5, "#2E2E2E"],   # Dark Gray (0% center)
+            [0.6, "#006400"],   # Dark Green (+0.75%)
+            [0.8, "#3C914A"],   # Softer Green (+1.5%)
+            [1.0, "#32CD32"]    # Muted Green (+2.5% or higher)
+        ]
+
         fig = px.imshow(
-            df.set_index("Sector").T.values,  # Transpose so sectors are x-axis
-            x=df["Sector"],  # X-axis: Sectors
-            y=["1D Change", "5D Change", "1M Change"],  # Y-axis: Metrics
-            color_continuous_scale=[(0, "red"), (0.5, "#2E2E2E"), (1, "green")],  # Custom color scale
+            df.set_index("Sector").T.values,  
+            x=df["Sector"],  
+            y=["1D Change", "5D Change", "1M Change"],  
+            color_continuous_scale=custom_colorscale,
             labels={"x": "Sector", "y": "Metric", "color": "Change %"},
-            zmin=-0.05,  # Adjust as needed
-            zmax=0.08
+            zmin=-0.025,  # Expanded range
+            zmax=0.025
         )
 
         fig.update_layout(
