@@ -68,7 +68,7 @@ def register_heatmap_callbacks(app):
         ]
 
         # Format values for display in heatmap
-        text_values = df.set_index("Sector").T.applymap(lambda x: f"{x:.2%}" if pd.notna(x) else "")
+        text_values = df.set_index("Sector").T.map(lambda x: f"{x:.2%}" if pd.notna(x) else "")
 
         fig = px.imshow(
             df.set_index("Sector").T.values,  
