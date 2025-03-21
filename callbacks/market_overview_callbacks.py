@@ -3,6 +3,8 @@ import pandas as pd
 import plotly.express as px
 from dash import Output, Input
 from utils import get_vix_data
+import plotly.graph_objects as go
+from datetime import datetime, timedelta
 
 df_vix = get_vix_data()
 
@@ -10,7 +12,7 @@ def register_market_overview_callbacks(app):
     """Register callbacks for Market Overview page."""
 
     @app.callback(
-        Output("market-overview-chart", "figure"),
+        Output("vix-chart", "figure"),  # Updated ID from "market-overview-chart" to "vix-chart"
         Input("interval-update", "n_intervals"),  # Auto-updates at intervals
     )
     def update_vix_chart(n):

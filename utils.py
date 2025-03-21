@@ -32,3 +32,4 @@ def get_vix_data(timeframe="6mo"):
     
 
     return df
+

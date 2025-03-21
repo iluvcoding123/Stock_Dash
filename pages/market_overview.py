@@ -8,10 +8,10 @@ def market_overview_layout():
         html.H2("Market Overview", className="text-center", style={'color': 'white'}),
         html.Hr(),
         
-        # VIX Chart
+        # VIX and Breadth Charts
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="market-overview-chart")
+                dcc.Graph(id="vix-chart")  # Changed from "market-overview-chart" to "vix-chart"
             ], width=12)
         ]),
         
